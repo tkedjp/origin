@@ -39,22 +39,7 @@ while True:
 
 height = new_height
 
-# start = time()
-
-# #Selenium解析
-# a_tags = driver.find_elements_by_css_selector('a.newsFeed_item_link')
-
-# for i, a_tag in enumerate(a_tags):
-#     print('='*30, i, '='*30)
-#     print(a_tag.find_element_by_css_selector('.newsFeed_item_title').text)
-#     print(a_tag.get_attribute('href'))
-
-# print('='*30)
-# print(time() - start)
-# print('='*30)
-
-
-# #BeautifulSoup解析
+#BeautifulSoup解析
 search_list = []
 soup = BeautifulSoup(driver.page_source, 'lxml')
 a_tags = soup.select('h3.ipQwMb')
@@ -73,10 +58,6 @@ for i, a_tag in enumerate(a_tags):
         'page_url': page_url
     })
     print(search_list[-1])
-
-# print('='*30)
-# print(time() - start)
-# print('='*30)
 
 driver.quit()
 
