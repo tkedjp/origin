@@ -10,7 +10,7 @@ hotel_list = []
 base_url = 'https://www.jalan.net/040000/LRG_040200/SML_040202/?screenId=UWW1402&distCd=01&listId=0&activeSort=0&mvTabFlg=1&stayYear=2023&stayMonth=6&stayDay=23&stayCount=2&roomCount=1&adultNum=2&yadHb=1&roomCrack=200000&kenCd=040000&lrgCd=040200&smlCd=040202&vosFlg=6&idx={}'
 
 for i in range(max_page_index):
-    # print('hotel_list:', len(hotel_list))
+    print('hotel_list:', len(hotel_list))
     url = base_url.format(30*i)
 
     sleep(3)
@@ -38,29 +38,43 @@ for i in range(max_page_index):
         hotel_name = page_soup.select_one('#pankuzu > h1').text
         
         room_tags = page_soup.select_one('.shisetsu-roomsetsubi_body')
+        tags = room_tags.text
+        # print(tags)
 
-        if '総部屋数' not in room_tags:
-            single = room_tags.select_one('.shisetsu-roomsetsubi_body > tr:nth-child(2) > td > div > table tr:nth-child(2) > td:first-child')
-            double = room_tags.select_one('.shisetsu-roomsetsubi_body > tr:nth-child(2) > td > div > table tr:nth-child(2) > td:nth-child(2)')
-            twin = room_tags.select_one('.shisetsu-roomsetsubi_body > tr:nth-child(2) > td > div > table tr:nth-child(2) > td:nth-child(3)')
-            sweet = room_tags.select_one('.shisetsu-roomsetsubi_body > tr:nth-child(2) > td > div > table tr:nth-child(2) > td:last-child')
- 
-            sleep(3)
+        if '総部屋数' not in tags:
+            single = room_tags.select_one('.shisetsu-roomsetsubi_body > tr:nth-child(2) > td > div > table tr:nth-child(2) > td:first-child').text
+            double = room_tags.select_one('.shisetsu-roomsetsubi_body > tr:nth-child(2) > td > div > table tr:nth-child(2) > td:nth-child(2)').text
+            twin = room_tags.select_one('.shisetsu-roomsetsubi_body > tr:nth-child(2) > td > div > table tr:nth-child(2) > td:nth-child(3)').text
+            sweet = room_tags.select_one('.shisetsu-roomsetsubi_body > tr:nth-child(2) > td > div > table tr:nth-child(2) > td:last-child').text
+            total = None
 
-        elif 'シングル' not in room_tags:
+        elif 'シングル' not in tags:
             single = None
             double = None
             twin = None
             sweet = None
-
-            sleep(3)
+            total = room_tags.select_one('.shisetsu-roomsetsubi_body > tr:nth-child(1) > td > div > table tr:nth-child(2) > td:nth-child(5)').text
+            total = total.strip()
 
         else:
-            single = room_tags.select_one('.shisetsu-roomsetsubi_body > tr:nth-child(3) > td > div > table tr:nth-child(2) > td:first-child')
-            double = room_tags.select_one('.shisetsu-roomsetsubi_body > tr:nth-child(3) > td > div > table tr:nth-child(2) > td:nth-child(2)')
-            twin = room_tags.select_one('.shisetsu-roomsetsubi_body > tr:nth-child(3) > td > div > table tr:nth-child(2) > td:nth-child(3)')
-            sweet = room_tags.select_one('.shisetsu-roomsetsubi_body > tr:nth-child(3) > td > div > table tr:nth-child(2) > td:last-child')
-            
-            sleep(3)
-        
-        print(hotel_name,single,double,twin,sweet)
+            single = room_tags.select_one('.shisetsu-roomsetsubi_body > tr:nth-child(3) > td > div > table tr:nth-child(2) > td:first-child').text
+            double = room_tags.select_one('.shisetsu-roomsetsubi_body > tr:nth-child(3) > td > div > table tr:nth-child(2) > td:nth-child(2)').text
+            twin = room_tags.select_one('.shisetsu-roomsetsubi_body > tr:nth-child(3) > td > div > table tr:nth-child(2) > td:nth-child(3)').text
+            sweet = room_tags.select_one('.shisetsu-roomsetsubi_body > tr:nth-child(3) > td > div > table tr:nth-child(2) > td:last-child').text
+            total = room_tags.select_one('.shisetsu-roomsetsubi_body > tr:nth-child(1) > td > div > table tr:nth-child(2) > td:nth-child(5)').text
+            total = total.strip()
+
+        sleep(3)
+
+        hotel_list.append({
+            'ホテル名': hotel_name,
+            'シングル': single,
+            'ダブル': double,
+            'ツイン': twin,
+            'スイート': sweet,
+            '総部屋数': total
+        })
+        print(hotel_list[-1])        
+
+df = pd.DataFrame(hotel_list)
+df.to_csv('hotel_list.csv', index=False, encoding='utf-8-sig')
