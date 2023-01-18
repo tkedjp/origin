@@ -5,12 +5,12 @@ from bs4 import BeautifulSoup
 import pandas as pd
 
 max_page_index = 2
+price_list =  []
 hotel_list = []
 
 base_url = 'https://www.jalan.net/040000/LRG_040200/SML_040202/?screenId=UWW1402&distCd=01&listId=0&activeSort=0&mvTabFlg=1&stayYear=2023&stayMonth=6&stayDay=23&stayCount=2&roomCount=1&adultNum=2&yadHb=1&roomCrack=200000&kenCd=040000&lrgCd=040200&smlCd=040202&vosFlg=6&idx={}'
 
 for i in range(max_page_index):
-    print('hotel_list:', len(hotel_list))
     url = base_url.format(30*i)
 
     sleep(3)
@@ -21,6 +21,22 @@ for i in range(max_page_index):
         continue
 
     soup = BeautifulSoup(r.content, 'lxml')
+
+    #最安料金と1人あたりの料金
+    table_soup = soup.select('div.p-yadoCassette__body.p-searchResultItem__body > a > div')
+    for table in table_soup:
+        hotel = table.select_one('div.p-yadoCassette__body.p-searchResultItem__body > a > div > div > div.p-searchResultItem__summaryInner > div.p-searchResultItem__summaryLeft > h2').text
+        room_prices = table.select_one('div.p-yadoCassette__body.p-searchResultItem__body > a > div > div > div.p-searchResultItem__summaryInner > div.p-searchResultItem__summaryRight > dl > dd > span.p-searchResultItem__lowestPriceValue').text
+        per_prices = table.select_one('div.p-yadoCassette__body.p-searchResultItem__body > a > div > div > div.p-searchResultItem__summaryInner > div.p-searchResultItem__summaryRight > dl > dd > span.p-searchResultItem__lowestUnitPrice').text
+        sleep(3)
+
+        price_list.append({
+            'ホテル名':hotel,
+            '室料': room_prices,
+            '1人あたり': per_prices
+        })
+        print(price_list[-1])
+
     page_urls = soup.select('.jlnpc-yadoCassette__link')
     # print(page_urls)
 
@@ -33,10 +49,12 @@ for i in range(max_page_index):
         if page_r.status_code >= 400:
             print(F'{page_url}は無効です')
             continue
-
+        
+        #ホテル名
         page_soup = BeautifulSoup(page_r.content, 'lxml')
         hotel_name = page_soup.select_one('#pankuzu > h1').text
         
+        #タイプ別の室数
         room_tags = page_soup.select_one('.shisetsu-roomsetsubi_body')
         tags = room_tags.text
         # print(tags)
@@ -74,7 +92,10 @@ for i in range(max_page_index):
             'スイート': sweet,
             '総部屋数': total
         })
-        print(hotel_list[-1])        
+        print(hotel_list[-1])
 
-df = pd.DataFrame(hotel_list)
-df.to_csv('hotel_list.csv', index=False, encoding='utf-8-sig')
+#dataframeにしてホテル名で結合してcsvに出力
+df_p = pd.DataFrame(price_list)
+df_h = pd.DataFrame(hotel_list)
+lsit = pd.merge(df_h, df_p, on='ホテル名')
+lsit.to_csv('list.csv', index=False, encoding='utf-8-sig')
