@@ -2,12 +2,13 @@ import tkinter
 from tkinter import RIGHT, END, DISABLED
 from tkinter.constants import NORMAL
 from decimal import Decimal
+from tkmacosx import Button
 
 #ウインドウの作成
 root = tkinter.Tk()
 root.title('電卓')
 root.iconbitmap('calculator.ico')
-root.geometry('325x405')
+root.geometry('540x395')
 root.resizable(0, 0)
 
 #関数の定義
@@ -107,25 +108,25 @@ screen = tkinter.Entry(screen_frame, width=40, font=screen_font, bg=light_orange
 screen.pack()
 
 #ボタンの作成
-clear_button = tkinter.Button(button_frame, text='C', font=button_font, bg=light_gray, command=clear_number)
-negate_button = tkinter.Button(button_frame, text='+/-', font=button_font, bg=light_gray, command=negate)
-percentage_button = tkinter.Button(button_frame, text='%', font=button_font, bg=light_gray, command=percentage)
-divide_button = tkinter.Button(button_frame, text='÷', font=button_font, bg=orange, fg=orange, comman=lambda: operate('divide'))
-seven_button = tkinter.Button(button_frame, text='7', font=button_font, bg=black, fg=black, command=lambda: add_element(7))
-eight_button = tkinter.Button(button_frame, text='8', font=button_font, bg=black, fg=black, command=lambda: add_element(8))
-nine_button = tkinter.Button(button_frame, text='9', font=button_font, bg=black, fg=black, command=lambda: add_element(9))
-multiply_button = tkinter.Button(button_frame, text='×', font=button_font, bg=orange, fg=orange, comman=lambda: operate('multiply'))
-four_button = tkinter.Button(button_frame, text='4', font=button_font, bg=black, fg=black, command=lambda: add_element(4))
-five_button = tkinter.Button(button_frame, text='5', font=button_font, bg=black, fg=black, command=lambda: add_element(5))
-six_button = tkinter.Button(button_frame, text='6', font=button_font, bg=black, fg=black, command=lambda: add_element(6))
-substract_button = tkinter.Button(button_frame, text='-', font=button_font, bg=orange, fg=orange, comman=lambda: operate('substract'))
-one_button = tkinter.Button(button_frame, text='1', font=button_font, bg=black, fg=black, command=lambda: add_element(1))
-two_button = tkinter.Button(button_frame, text='2', font=button_font, bg=black, fg=black, command=lambda: add_element(2))
-three_button = tkinter.Button(button_frame, text='3', font=button_font, bg=black, fg=black, command=lambda: add_element(3))
-add_button = tkinter.Button(button_frame, text='+', font=button_font, bg=orange, fg=orange, comman=lambda: operate('add'))
-zero_button = tkinter.Button(button_frame, text='0', font=button_font, bg=black, fg=black, command=lambda: add_element(0))
-decimal_button = tkinter.Button(button_frame, text='.', font=button_font, bg=black, fg=black, command=lambda: add_element('.'))
-equal_button = tkinter.Button(button_frame, text='=', font=button_font, bg=orange, fg=orange, comman=calculate)
+clear_button = Button(button_frame, text='C', font=button_font, bg=light_gray, command=clear_number)
+negate_button = Button(button_frame, text='+/-', font=button_font, bg=light_gray, command=negate)
+percentage_button = Button(button_frame, text='%', font=button_font, bg=light_gray, command=percentage)
+divide_button = Button(button_frame, text='÷', font=button_font, bg=orange, fg=black, command=lambda: operate('divide'))
+seven_button = Button(button_frame, text='7', font=button_font, bg=black, fg=white, command=lambda: add_element(7))
+eight_button = Button(button_frame, text='8', font=button_font, bg=black, fg=white, command=lambda: add_element(8))
+nine_button = Button(button_frame, text='9', font=button_font, bg=black, fg=white, command=lambda: add_element(9))
+multiply_button = Button(button_frame, text='×', font=button_font, bg=orange, fg=black, command=lambda: operate('multiply'))
+four_button = Button(button_frame, text='4', font=button_font, bg=black, fg=white, command=lambda: add_element(4))
+five_button = Button(button_frame, text='5', font=button_font, bg=black, fg=white, command=lambda: add_element(5))
+six_button = Button(button_frame, text='6', font=button_font, bg=black, fg=white, command=lambda: add_element(6))
+substract_button = Button(button_frame, text='-', font=button_font, bg=orange, fg=black, command=lambda: operate('substract'))
+one_button = Button(button_frame, text='1', font=button_font, bg=black, fg=white, command=lambda: add_element(1))
+two_button = Button(button_frame, text='2', font=button_font, bg=black, fg=white, command=lambda: add_element(2))
+three_button = Button(button_frame, text='3', font=button_font, bg=black, fg=white, command=lambda: add_element(3))
+add_button = Button(button_frame, text='+', font=button_font, bg=orange, fg=black, command=lambda: operate('add'))
+zero_button = Button(button_frame, text='0', font=button_font, bg=black, fg=white, command=lambda: add_element(0))
+decimal_button = Button(button_frame, text='.', font=button_font, bg=black, fg=white, command=lambda: add_element('.'))
+equal_button = Button(button_frame, text='=', font=button_font, bg=orange, fg=black, command=calculate)
 
 #1行目の配置
 clear_button.grid(row=0, column=0, sticky='WE', pady=1, ipady=15)
@@ -134,10 +135,10 @@ percentage_button.grid(row=0, column=2, sticky='WE', pady=1, ipady=15)
 divide_button.grid(row=0, column=3, sticky='WE', pady=1, ipady=15)
 
 #2行目の配置(ボタンの引き伸ばしをipadxで)
-seven_button.grid(row=1, column=0, sticky='WE', ipadx=15, pady=1, ipady=15)
-eight_button.grid(row=1, column=1, sticky='WE', ipadx=15, pady=1, ipady=15)
-nine_button.grid(row=1, column=2, sticky='WE', ipadx=15, pady=1, ipady=15)
-multiply_button.grid(row=1, column=3, sticky='WE', ipadx=15, pady=1, ipady=15)
+seven_button.grid(row=1, column=0, sticky='WE', ipadx=3, pady=1, ipady=15)
+eight_button.grid(row=1, column=1, sticky='WE', ipadx=3, pady=1, ipady=15)
+nine_button.grid(row=1, column=2, sticky='WE', ipadx=3, pady=1, ipady=15)
+multiply_button.grid(row=1, column=3, sticky='WE', ipadx=3, pady=1, ipady=15)
 
 #3行目の配置
 four_button.grid(row=2, column=0, sticky='WE', pady=1, ipady=15)
