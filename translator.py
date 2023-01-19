@@ -43,6 +43,7 @@ def convert():
     after_text = translator.translate(before_text, src=languages[before_language], dest=languages[after_language])
     output_box.insert('1.0', after_text.text)
 
+#ファイルの保存
 def save():
     file_name = filedialog.asksaveasfilename(title='名前をつけて保存', filetypes=[('Text', '.txt'), ('PNG', '.png')], initialdir='./', defaultextension='.txt')
     with open(file_name, 'w') as f:
@@ -62,7 +63,7 @@ output_pulldown.grid(row=0, column=2, padx=10)
 input_pulldown.set('日本語')
 output_pulldown.set('英語')
 
-# 入力&出力欄の作成
+# 複数行入力できる入力欄と出力欄の作成
 input_box = tkinter.Text(root, font=normal_font, width=40, height=20, borderwidth=3)
 output_box = tkinter.Text(root, font=normal_font, width=40, height=20, borderwidth=3)
 equal_sign = tkinter.Label(root, text='=', font=normal_font, bg=bg_color)
