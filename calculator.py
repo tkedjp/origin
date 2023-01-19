@@ -1,5 +1,7 @@
 import tkinter
-from tkinter import RIGHT, END, DISABLED, NORMAL
+from tkinter import RIGHT, END, DISABLED
+from tkinter.constants import NORMAL
+from decimal import Decimal
 
 #ウインドウの作成
 root = tkinter.Tk()
@@ -64,17 +66,17 @@ def operate(operator):
 def calculate():
     #演算の実行
     if operation == 'add':
-        calculated_number = float(first_number) + float(screen.get())
+        calculated_number = Decimal(first_number) + Decimal(screen.get())
     elif operation == 'substract':
-        calculated_number = float(first_number) - float(screen.get())
+        calculated_number = Decimal(first_number) - Decimal(screen.get())
     elif operation == 'multiply':
-        calculated_number = float(first_number) * float(screen.get())
+        calculated_number = Decimal(first_number) * Decimal(screen.get())
     elif operation == 'divide':
         #分母に0が来ているかどうかの判定
         if screen.get() == '0':
             calculated_number = 'ERROR'
         else:
-            calculated_number = float(first_number) / float(screen.get())
+            calculated_number = Decimal(first_number) / Decimal(screen.get())
 
     #計算結果を表示するために現在スクリーンに表示されている数字を削除
     screen.delete(0, END)
