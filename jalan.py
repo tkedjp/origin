@@ -97,5 +97,5 @@ for i in range(max_page_index):
 #dataframeにしてホテル名で結合してcsvに出力
 df_p = pd.DataFrame(price_list)
 df_h = pd.DataFrame(hotel_list)
-lsit = pd.merge(df_h, df_p, on='ホテル名')
-lsit.to_csv('list.csv', index=False, encoding='utf-8-sig')
+df = pd.merge(df_h, df_p, on='ホテル名')
+df.to_csv('list.csv', index=False, encoding='utf-8-sig')
