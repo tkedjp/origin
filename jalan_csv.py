@@ -42,12 +42,13 @@ for i in range(max_page_index):
     #最安料金と1人あたりの料金
     table_soup = page_soup.select('div.p-yadoCassette__body.p-searchResultItem__body')
     for table in table_soup:
-        hotel = table.select_one('div.p-yadoCassette__body.p-searchResultItem__body > a > div > div > div.p-searchResultItem__summaryInner > div.p-searchResultItem__summaryLeft > h2').text
-        room_price = table.select_one('div.p-yadoCassette__body.p-searchResultItem__body > a > div > div > div.p-searchResultItem__summaryInner > div.p-searchResultItem__summaryRight > dl > dd > span.p-searchResultItem__lowestPriceValue').text
-        per_price = table.select_one('div.p-yadoCassette__body.p-searchResultItem__body > a > div > div > div.p-searchResultItem__summaryInner > div.p-searchResultItem__summaryRight > dl > dd > span.p-searchResultItem__lowestUnitPrice').text
-        page_urls = table.select('div.p-yadoCassette__body.p-searchResultItem__body > a.jlnpc-yadoCassette__link')
+        hotel = table.select_one('a > div > div > div.p-searchResultItem__summaryInner > div.p-searchResultItem__summaryLeft > h2').text
+        room_price = table.select_one('a > div > div > div.p-searchResultItem__summaryInner > div.p-searchResultItem__summaryRight > dl > dd > span.p-searchResultItem__lowestPriceValue').text
+        per_price = table.select_one('a > div > div > div.p-searchResultItem__summaryInner > div.p-searchResultItem__summaryRight > dl > dd > span.p-searchResultItem__lowestUnitPrice').text
+        page_urls = table.select('a.jlnpc-yadoCassette__link')
+        # print(hotel,room_price,per_price,page_urls)
         
-        sleep(3)
+        # sleep(3)
 
         for i, page_url in enumerate(page_urls):
             page_url = 'https://www.jalan.net' + page_url.get('href')
@@ -64,25 +65,33 @@ for i in range(max_page_index):
             # hotel_name = hotel_page_soup.select_one('#pankuzu > h1').text
 
             #住所
-            address_tags = hotel_page_soup.select_one('#jlnpc-main-contets-area > div.shisetsu-accesspartking_body_wrap > table tr:nth-child(1) > td')
-            address = address_tags.text
-            address = address.replace('大きな地図をみる', '')
-            address = address.strip()
+            address_tags = hotel_page_soup.select_one('#jlnpc-main-contets-area > div.shisetsu-accesspartking_body_wrap > table tr:nth-child(1) > td').text
+            if address_tags == None:
+                continue
+
+            else: 
+            # address = address_tags.text
+                address = address_tags.replace('大きな地図をみる', '')
+                address = address.strip()
         
             #駐車場
-            parking_tags = hotel_page_soup.select_one('#jlnpc-main-contets-area > div.shisetsu-accesspartking_body_wrap > table tr:nth-child(3) > td').text        
-            parking = parking_tags.replace('\n','')
-            parking = parking.strip()
+            parking_tags = hotel_page_soup.select_one('#jlnpc-main-contets-area > div.shisetsu-accesspartking_body_wrap > table tr:nth-child(3) > td').text  
+            if parking_tags == None:
+                continue
+
+            else:
+                parking = parking_tags.replace('\n','')
+                parking = parking.strip()
 
             #タイプ別の室数
-            room_tags = hotel_page_soup.select_one('.shisetsu-roomsetsubi_body')
-            tags = room_tags.text
+            room_tag = hotel_page_soup.select_one('.shisetsu-roomsetsubi_body')
+            tags = room_tag.text
 
             if '総部屋数' not in tags:
-                single = room_tags.select_one('.shisetsu-roomsetsubi_body > tr:nth-child(2) > td > div > table tr:nth-child(2) > td:first-child').text
-                double = room_tags.select_one('.shisetsu-roomsetsubi_body > tr:nth-child(2) > td > div > table tr:nth-child(2) > td:nth-child(2)').text
-                twin = room_tags.select_one('.shisetsu-roomsetsubi_body > tr:nth-child(2) > td > div > table tr:nth-child(2) > td:nth-child(3)').text
-                sweet = room_tags.select_one('.shisetsu-roomsetsubi_body > tr:nth-child(2) > td > div > table tr:nth-child(2) > td:last-child').text
+                single = room_tag.select_one('tr:nth-child(2) > td > div > table tr:nth-child(2) > td:first-child').text
+                double = room_tag.select_one('tr:nth-child(2) > td > div > table tr:nth-child(2) > td:nth-child(2)').text
+                twin = room_tag.select_one('tr:nth-child(2) > td > div > table tr:nth-child(2) > td:nth-child(3)').text
+                sweet = room_tag.select_one('tr:nth-child(2) > td > div > table tr:nth-child(2) > td:last-child').text
                 total = None
 
             elif 'シングル' not in tags:
@@ -90,18 +99,18 @@ for i in range(max_page_index):
                 double = None
                 twin = None
                 sweet = None
-                total = room_tags.select_one('.shisetsu-roomsetsubi_body > tr:nth-child(1) > td > div > table tr:nth-child(2) > td:nth-child(5)').text
+                total = room_tag.select_one('tr:nth-child(1) > td > div > table tr:nth-child(2) > td:nth-child(5)').text
                 total = total.strip()
 
             else:
-                single = room_tags.select_one('.shisetsu-roomsetsubi_body > tr:nth-child(3) > td > div > table tr:nth-child(2) > td:first-child').text
-                double = room_tags.select_one('.shisetsu-roomsetsubi_body > tr:nth-child(3) > td > div > table tr:nth-child(2) > td:nth-child(2)').text
-                twin = room_tags.select_one('.shisetsu-roomsetsubi_body > tr:nth-child(3) > td > div > table tr:nth-child(2) > td:nth-child(3)').text
-                sweet = room_tags.select_one('.shisetsu-roomsetsubi_body > tr:nth-child(3) > td > div > table tr:nth-child(2) > td:last-child').text
-                total = room_tags.select_one('.shisetsu-roomsetsubi_body > tr:nth-child(1) > td > div > table tr:nth-child(2) > td:nth-child(5)').text
+                single = room_tag.select_one('tr:nth-child(3) > td > div > table tr:nth-child(2) > td:first-child').text
+                double = room_tag.select_one('tr:nth-child(3) > td > div > table tr:nth-child(2) > td:nth-child(2)').text
+                twin = room_tag.select_one('tr:nth-child(3) > td > div > table tr:nth-child(2) > td:nth-child(3)').text
+                sweet = room_tag.select_one('tr:nth-child(3) > td > div > table tr:nth-child(2) > td:last-child').text
+                total = room_tag.select_one('tr:nth-child(1) > td > div > table tr:nth-child(2) > td:nth-child(5)').text
                 total = total.strip()
 
-            sleep(3)
+            # sleep(3)
 
             hotel_list.append({
                 'ホテル名': hotel,
