@@ -11,7 +11,6 @@ import pandas as pd
 
 import docx
 from docx.enum.text import WD_ALIGN_PARAGRAPH
-import pandas as pd
 
 # ウィンドウの作成
 root = tkinter.Tk()
