@@ -15,10 +15,33 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 # ウィンドウの作成
 root = tkinter.Tk()
 root.title('じゃらん')
-root.geometry('380x210')
+root.geometry('380x270')
 root.resizable(0, 0)
 
+#日付
+date = tkinter.Label(text='チェックインする日：').grid(row=1, column=1, padx=5, pady=5)
+date_box = ttk.Combobox(values=[datetime.date.today() + datetime.timedelta(days=i) for i in range(180)])
+date_box.grid(row=1, column=2, padx=5, pady=5)
+
+#泊数
+stay_count = tkinter.Label(text='泊数：').grid(row=2, column=1, padx=5, pady=5)
+stay_count_box = ttk.Combobox(values=[i+1 for i in range(10)])
+stay_count_box.grid(row=2, column=2, padx=5, pady=5)
+
+#室数
+room_count = tkinter.Label(text='室数：').grid(row=3, column=1, padx=5, pady=5)
+room_count_box = ttk.Combobox(values=[i+1 for i in range(10)])
+room_count_box.grid(row=3, column=2, padx=5, pady=5)
+
+#人数
+adult_num = tkinter.Label(text='人数：').grid(row=4, column=1, padx=5, pady=5)
+adult_num_box = ttk.Combobox(values=[i+1 for i in range(9)])
+adult_num_box.grid(row=4, column=2, padx=5, pady=5)
+
 def save():
+    # global max_page_index, processed
+    processed = 0
+    # max_page_index = 0
     date_box_value = date_box.get()
     month = date_box_value[5:7]
     day = date_box_value[8:10]
@@ -37,11 +60,14 @@ def save():
 
     soup = BeautifulSoup(r.content, 'lxml')
 
-    number = soup.select_one('td.jlnpc-planListCnt-header > span.s16_F60b').text
-    max_page_index = int(number) // 30 + 1
+    total_number = soup.select_one('td.jlnpc-planListCnt-header > span.s16_F60b').text
+    # print(total_number)
+    max_page_index = int(total_number) // 30 + 1
+
 
     for i in range(max_page_index):
         url = base_url.format(30*i)
+        # display = '処理中です'
 
         sleep(3)
 
@@ -60,7 +86,7 @@ def save():
             per_price = table.select_one('a > div > div > div.p-searchResultItem__summaryInner > div.p-searchResultItem__summaryRight > dl > dd > span.p-searchResultItem__lowestUnitPrice').text
             page_urls = table.select('a.jlnpc-yadoCassette__link')
 
-            for i, page_url in enumerate(page_urls):
+            for i, page_url in enumerate(page_urls):  
                 page_url = 'https://www.jalan.net' + page_url.get('href')
 
                 sleep(3)
@@ -131,8 +157,11 @@ def save():
                     '1人あたり': per_price,
                     '駐車場': parking
                 })
-                print(hotel_list[-1])
+                # print(hotel_list[-1])
 
+            processed += 1
+            print(f'残りは{processed}/{total_number}です')
+            
     #csv出力
     df = pd.DataFrame(hotel_list)
     df.to_csv('list.csv', index=False, encoding='utf-8-sig')
@@ -184,28 +213,12 @@ def save():
     # ファイルを保存
     doc.save('hotel_list.docx')
 
-#日付
-date = tkinter.Label(text='チェックインする日：').grid(row=1, column=1, padx=5, pady=5)
-date_box = ttk.Combobox(values=[datetime.date.today() + datetime.timedelta(days=i) for i in range(180)])
-date_box.grid(row=1, column=2, padx=5, pady=5)
-
-#泊数
-stay_count = tkinter.Label(text='泊数：').grid(row=2, column=1, padx=5, pady=5)
-stay_count_box = ttk.Combobox(values=[i+1 for i in range(10)])
-stay_count_box.grid(row=2, column=2, padx=5, pady=5)
-
-#室数
-room_count = tkinter.Label(text='室数：').grid(row=3, column=1, padx=5, pady=5)
-room_count_box = ttk.Combobox(values=[i+1 for i in range(10)])
-room_count_box.grid(row=3, column=2, padx=5, pady=5)
-
-#人数
-adult_num = tkinter.Label(text='人数：').grid(row=4, column=1, padx=5, pady=5)
-adult_num_box = ttk.Combobox(values=[i+1 for i in range(9)])
-adult_num_box.grid(row=4, column=2, padx=5, pady=5)
+#処理中
+progress = tkinter.Label(text='処理状況：').grid(row=5, column=1, padx=5, pady=5)
+progress_label = tkinter.Label(text='').grid(row=5, column=2, padx=5, pady=5)
 
 #実行
-save_button = tkinter.Button(text='取得', command=save).grid(row=5, column=2, padx=5, pady=20, ipadx=10, ipady=10)
+save_button = tkinter.Button(text='取得', command=save).grid(row=6, column=2, padx=5, pady=20, ipadx=4, ipady=4)
 
 # ウィンドウのループ処理
 root.mainloop()
