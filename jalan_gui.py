@@ -19,27 +19,31 @@ root.geometry('380x270')
 root.resizable(0, 0)
 
 #日付
-date = tkinter.Label(text='チェックインする日：').grid(row=1, column=1, padx=5, pady=5)
-date_box = ttk.Combobox(values=[datetime.date.today() + datetime.timedelta(days=i) for i in range(180)])
+date = tkinter.Label(text='チェックインする日：')
+date.grid(row=1, column=1, padx=5, pady=5)
+date_box = ttk.Combobox(values=[datetime.date.today() + datetime.timedelta(days=i+1) for i in range(180)])
 date_box.grid(row=1, column=2, padx=5, pady=5)
 
 #泊数
-stay_count = tkinter.Label(text='泊数：').grid(row=2, column=1, padx=5, pady=5)
+stay_count_label = tkinter.Label(text='泊数：')
+stay_count_label.grid(row=2, column=1, padx=5, pady=5)
 stay_count_box = ttk.Combobox(values=[i+1 for i in range(10)])
 stay_count_box.grid(row=2, column=2, padx=5, pady=5)
 
 #室数
-room_count = tkinter.Label(text='室数：').grid(row=3, column=1, padx=5, pady=5)
+room_count_label = tkinter.Label(text='室数：')
+room_count_label.grid(row=3, column=1, padx=5, pady=5)
 room_count_box = ttk.Combobox(values=[i+1 for i in range(10)])
 room_count_box.grid(row=3, column=2, padx=5, pady=5)
 
 #人数
-adult_num = tkinter.Label(text='人数：').grid(row=4, column=1, padx=5, pady=5)
+adult_num_label = tkinter.Label(text='人数：')
+adult_num_label.grid(row=4, column=1, padx=5, pady=5)
 adult_num_box = ttk.Combobox(values=[i+1 for i in range(9)])
 adult_num_box.grid(row=4, column=2, padx=5, pady=5)
 
 def save():
-    # global max_page_index, processed
+    global total_number, processed
     processed = 0
     # max_page_index = 0
     date_box_value = date_box.get()
@@ -98,23 +102,25 @@ def save():
             
                 #ホテル名
                 hotel_page_soup = BeautifulSoup(hotel_page_r.content, 'lxml')
-
+     
                 #住所
-                address_tags = hotel_page_soup.select_one('#jlnpc-main-contets-area > div.shisetsu-accesspartking_body_wrap > table tr:nth-child(1) > td').text
-                if address_tags == None:
-                    continue
+                address_tags = hotel_page_soup.select_one('#jlnpc-main-contets-area > div.shisetsu-accesspartking_body_wrap > table tr:nth-child(1) > td')
+                if address_tags is None:
+                    address = None
 
-                else: 
-                    address = address_tags.replace('大きな地図をみる', '')
+                else:
+                    address = address_tags.text
+                    address = address.replace('大きな地図をみる', '')
                     address = address.strip()
             
                 #駐車場
-                parking_tags = hotel_page_soup.select_one('#jlnpc-main-contets-area > div.shisetsu-accesspartking_body_wrap > table tr:nth-child(3) > td').text  
-                if parking_tags == None:
-                    continue
-
+                parking_tags = hotel_page_soup.select_one('#jlnpc-main-contets-area > div.shisetsu-accesspartking_body_wrap > table tr:nth-child(3) > td')  
+                if parking_tags is None:
+                    parking = None
+                
                 else:
-                    parking = parking_tags.replace('\n','')
+                    parking = parking_tags.text
+                    parking = parking.replace('\n','')
                     parking = parking.strip()
 
                 #タイプ別の室数
@@ -158,9 +164,9 @@ def save():
                     '駐車場': parking
                 })
                 # print(hotel_list[-1])
-
             processed += 1
-            print(f'残りは{processed}/{total_number}です')
+            progress_label.config(text=f'残りは{processed}/{total_number}です')
+            progress_label.update()
             
     #csv出力
     df = pd.DataFrame(hotel_list)
@@ -214,8 +220,10 @@ def save():
     doc.save('hotel_list.docx')
 
 #処理中
-progress = tkinter.Label(text='処理状況：').grid(row=5, column=1, padx=5, pady=5)
-progress_label = tkinter.Label(text='').grid(row=5, column=2, padx=5, pady=5)
+progress = tkinter.Label(text='処理状況：')
+progress.grid(row=5, column=1, padx=5, pady=5)
+progress_label = tkinter.Label(text='')
+progress_label.grid(row=5, column=2, padx=5, pady=5)
 
 #実行
 save_button = tkinter.Button(text='取得', command=save).grid(row=6, column=2, padx=5, pady=20, ipadx=4, ipady=4)
