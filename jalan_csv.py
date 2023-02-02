@@ -8,7 +8,9 @@ hotel_list = []
 
 # year = input('チェックインする年を入力してください：')
 month = input('チェックインする月を入力してください：')
+month = month.zfill(2)
 day = input('チェックインする日を入力してください：')
+day = day.zfill(2)
 stay_count = input('泊数を入力してください：')
 room_count = input('室数を入力してください：')
 adult_num = input('人数を入力してください：')
@@ -65,22 +67,23 @@ for i in range(max_page_index):
             # hotel_name = hotel_page_soup.select_one('#pankuzu > h1').text
 
             #住所
-            address_tags = hotel_page_soup.select_one('#jlnpc-main-contets-area > div.shisetsu-accesspartking_body_wrap > table tr:nth-child(1) > td').text
-            if address_tags == None:
-                continue
+            address_tags = hotel_page_soup.select_one('#jlnpc-main-contets-area > div.shisetsu-accesspartking_body_wrap > table tr:nth-child(1) > td')
+            if address_tags is None:
+                address = None
 
-            else: 
-            # address = address_tags.text
-                address = address_tags.replace('大きな地図をみる', '')
+            else:
+                address = address_tags.text
+                address = address.replace('大きな地図をみる', '')
                 address = address.strip()
         
             #駐車場
-            parking_tags = hotel_page_soup.select_one('#jlnpc-main-contets-area > div.shisetsu-accesspartking_body_wrap > table tr:nth-child(3) > td').text  
-            if parking_tags == None:
-                continue
-
+            parking_tags = hotel_page_soup.select_one('#jlnpc-main-contets-area > div.shisetsu-accesspartking_body_wrap > table tr:nth-child(3) > td')  
+            if parking_tags is None:
+                parking = None
+            
             else:
-                parking = parking_tags.replace('\n','')
+                parking = parking_tags.text
+                parking = parking.replace('\n','')
                 parking = parking.strip()
 
             #タイプ別の室数
