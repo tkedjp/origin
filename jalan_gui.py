@@ -219,6 +219,9 @@ def save():
     # ファイルを保存
     doc.save('hotel_list.docx')
 
+    progress_label.config(text='取得完了')
+    progress_label.update()
+
 #処理中
 progress = tkinter.Label(text='処理状況：')
 progress.grid(row=5, column=1, padx=5, pady=5)
