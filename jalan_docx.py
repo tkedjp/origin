@@ -1,7 +1,5 @@
 import docx
-from docx.shared import RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
-# from docx.enum.table import WD_TABLE_ALIGNMENT
 import pandas as pd
 
 def add_hyperlink(paragraph, url, text):
