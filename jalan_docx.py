@@ -1,7 +1,43 @@
 import docx
+from docx.shared import RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 # from docx.enum.table import WD_TABLE_ALIGNMENT
 import pandas as pd
+
+def add_hyperlink(paragraph, url, text):
+
+    """
+    パラグラフオブジェクトの中にハイパーリンクを配置する関数です。
+
+    :param paragraph: ハイパーリンクを追加する段落。
+    :param url: 必要な url を含む文字列
+    :param text: urlに対応するテキストを表示します。
+    :param return: ハイパーリンクオブジェクト
+    """
+
+    # これは document.xml.rels ファイルへのアクセスを取得し、新しいリレーションIDの値を取得します。
+    part = paragraph.part
+    r_id = part.relate_to(url, docx.opc.constants.RELATIONSHIP_TYPE.HYPERLINK, is_external=True)
+
+    # w:hyperlinkタグを作成し、必要な値を追加する
+    hyperlink = docx.oxml.shared.OxmlElement('w:hyperlink')
+    hyperlink.set(docx.oxml.shared.qn('r:id'), r_id, )
+
+    # w:r要素を作成する
+    new_run = docx.oxml.shared.OxmlElement('w:r')
+
+    # 新しいw:rPr要素を作成する
+    rPr = docx.oxml.shared.OxmlElement('w:rPr')
+
+    # すべてのxml要素を結合し、必要なテキストをw:r要素に追加する
+    new_run.append(rPr)
+    new_run.text = text
+    hyperlink.append(new_run)
+
+    paragraph._p.append(hyperlink)
+
+    return hyperlink
+
 
 # wordファイルを新規作成
 doc = docx.Document()
@@ -39,7 +75,8 @@ for i, r in df.iterrows():
     doc.add_paragraph('室料：'+ str(r['室料']))
     doc.add_paragraph('1人あたり：'+ str(r['1人あたり']))
     doc.add_paragraph('駐車場：'+ r['駐車場'].strip())
-    doc.add_paragraph('詳細ページ：'+ r['詳細ページ'])
+    p = doc.add_paragraph('詳細ページ：'+ r['詳細ページ'])
+    add_hyperlink(p, r['詳細ページ'], r['詳細ページ'])
 
     # 改ページ
     doc.add_page_break()
