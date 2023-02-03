@@ -8,7 +8,9 @@ hotel_list = []
 
 # year = input('チェックインする年を入力してください：')
 month = input('チェックインする月を入力してください：')
+month = month.zfill(2)
 day = input('チェックインする日を入力してください：')
+day = day.zfill(2)
 stay_count = input('泊数を入力してください：')
 room_count = input('室数を入力してください：')
 adult_num = input('人数を入力してください：')
@@ -65,22 +67,23 @@ for i in range(max_page_index):
             # hotel_name = hotel_page_soup.select_one('#pankuzu > h1').text
 
             #住所
-            address_tags = hotel_page_soup.select_one('#jlnpc-main-contets-area > div.shisetsu-accesspartking_body_wrap > table tr:nth-child(1) > td').text
-            if address_tags == None:
-                continue
+            address_tags = hotel_page_soup.select_one('#jlnpc-main-contets-area > div.shisetsu-accesspartking_body_wrap > table tr:nth-child(1) > td')
+            if address_tags is None:
+                address = None
 
-            else: 
-            # address = address_tags.text
-                address = address_tags.replace('大きな地図をみる', '')
+            else:
+                address = address_tags.text
+                address = address.replace('大きな地図をみる', '')
                 address = address.strip()
         
             #駐車場
-            parking_tags = hotel_page_soup.select_one('#jlnpc-main-contets-area > div.shisetsu-accesspartking_body_wrap > table tr:nth-child(3) > td').text  
-            if parking_tags == None:
-                continue
-
+            parking_tags = hotel_page_soup.select_one('#jlnpc-main-contets-area > div.shisetsu-accesspartking_body_wrap > table tr:nth-child(3) > td')  
+            if parking_tags is None:
+                parking = None
+            
             else:
-                parking = parking_tags.replace('\n','')
+                parking = parking_tags.text
+                parking = parking.replace('\n','')
                 parking = parking.strip()
 
             #タイプ別の室数
@@ -138,64 +141,9 @@ SCOPES = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/au
 SERVICE_ACCOUNT_FILE = 'xxxxxx.json'
 credentials = ServiceAccountCredentials.from_json_keyfile_name(SERVICE_ACCOUNT_FILE, SCOPES)
 gs = gspread.authorize(credentials)
-SPREADSHEET_KEY = 'xxxxxxx'
+SPREADSHEET_KEY = 'xxxxxx'
 
 #書込
 df = pd.DataFrame(hotel_list)
 workbook = gs.open_by_key(SPREADSHEET_KEY)
 set_with_dataframe(workbook.worksheet("シート1"), df, include_index=False)
-
-#docx
-import docx
-from docx.enum.text import WD_ALIGN_PARAGRAPH
-
-# wordファイルを新規作成
-doc = docx.Document()
-
-#読込
-worksheet= gs.open_by_key(SPREADSHEET_KEY).sheet1
-#カラムを1行目に指定し，2行目以降の値を取得してデータフレームを作成
-df = pd.DataFrame(worksheet.get_all_values()[1:],columns=worksheet.get_all_values()[0])
-# print(df)
-
-for i, r in df.iterrows():
-    # print(r['ホテル名'], r['詳細ページ'])
-    if i == '':
-        break
-
-    #表題
-    doc.add_heading(r['ホテル名'], 0)
-    doc.add_paragraph('住所：'+ r['住所'])
-
-    #部屋タイプ内訳をテーブルにする
-    table = doc.add_table(rows=1, cols=5)
-
-    header_cells = table.rows[0].cells
-    header_cells[0].text = 'シングル'
-    header_cells[1].text = 'ダブル'
-    header_cells[2].text = 'ツイン'
-    header_cells[3].text = 'スイート'
-    header_cells[4].text = '総部屋数'
-
-    row_cells = table.add_row().cells
-    row_cells[0].text = (str(r['シングル']))
-    row_cells[1].text = (str(r['ダブル']))
-    row_cells[2].text = (str(r['ツイン']))
-    row_cells[3].text = (str(r['スイート']))
-    row_cells[4].text = (str(r['総部屋数']))
-
-    doc.add_paragraph('')
-    doc.add_paragraph('室料：'+ str(r['室料']))
-    doc.add_paragraph('1人あたり：'+ str(r['1人あたり']))
-    doc.add_paragraph('駐車場：'+ r['駐車場'].strip())
-    doc.add_paragraph('詳細ページ：'+ r['詳細ページ'])
-
-    # 改ページ
-    doc.add_page_break()
-
-# すべての行を左揃えにする
-for p in doc.paragraphs:
-    p.alignment = WD_ALIGN_PARAGRAPH.LEFT
-    
-# ファイルを保存
-doc.save('hotel_list.docx')
