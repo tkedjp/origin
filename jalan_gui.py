@@ -167,10 +167,44 @@ def save():
             processed += 1
             progress_label.config(text=f'残りは{processed}/{total_number}です')
             progress_label.update()
-            
+
     #csv出力
     df = pd.DataFrame(hotel_list)
     df.to_csv('list.csv', index=False, encoding='utf-8-sig')
+
+    def add_hyperlink(paragraph, url, text):
+
+        """
+        パラグラフオブジェクトの中にハイパーリンクを配置する関数です。
+
+        :param paragraph: ハイパーリンクを追加する段落。
+        :param url: 必要な url を含む文字列
+        :param text: urlに対応するテキストを表示します。
+        :param return: ハイパーリンクオブジェクト
+        """
+
+        # これは document.xml.rels ファイルへのアクセスを取得し、新しいリレーションIDの値を取得します。
+        part = paragraph.part
+        r_id = part.relate_to(url, docx.opc.constants.RELATIONSHIP_TYPE.HYPERLINK, is_external=True)
+
+        # w:hyperlinkタグを作成し、必要な値を追加する
+        hyperlink = docx.oxml.shared.OxmlElement('w:hyperlink')
+        hyperlink.set(docx.oxml.shared.qn('r:id'), r_id, )
+
+        # w:r要素を作成する
+        new_run = docx.oxml.shared.OxmlElement('w:r')
+
+        # 新しいw:rPr要素を作成する
+        rPr = docx.oxml.shared.OxmlElement('w:rPr')
+
+        # すべてのxml要素を結合し、必要なテキストをw:r要素に追加する
+        new_run.append(rPr)
+        new_run.text = text
+        hyperlink.append(new_run)
+
+        paragraph._p.append(hyperlink)
+
+        return hyperlink
 
     # wordファイルを新規作成
     doc = docx.Document()
@@ -207,7 +241,8 @@ def save():
         doc.add_paragraph('室料：'+ str(r['室料']))
         doc.add_paragraph('1人あたり：'+ str(r['1人あたり']))
         doc.add_paragraph('駐車場：'+ r['駐車場'].strip())
-        doc.add_paragraph('詳細ページ：'+ r['詳細ページ'])
+        p = doc.add_paragraph('詳細ページ：'+ r['詳細ページ'])
+        add_hyperlink(p, r['詳細ページ'], r['詳細ページ'])
 
         # 改ページ
         doc.add_page_break()
@@ -218,7 +253,7 @@ def save():
         
     # ファイルを保存
     doc.save('hotel_list.docx')
-
+    
     progress_label.config(text='取得完了')
     progress_label.update()
 
