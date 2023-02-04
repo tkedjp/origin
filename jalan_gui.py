@@ -9,6 +9,8 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 
+import math
+
 import docx
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 
@@ -56,26 +58,29 @@ def save():
     hotel_list = []
     base_url = 'https://www.jalan.net/040000/LRG_040200/SML_040202/?screenId=UWW1402&distCd=01&listId=0&activeSort=0&mvTabFlg=1&stayYear=2023&stayMonth=' + month + '&stayDay=' + day + '&stayCount=' + stay_count + '&roomCount=' + room_count +'&adultNum=' + adult_num +'&yadHb=1&roomCrack=200000&kenCd=040000&lrgCd=040200&smlCd=040202&vosFlg=6&idx={}'
 
+    user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36'
+    header = {
+        'User-Agent': user_agent
+    }
+
     sleep(3)
 
-    r = requests.get(base_url, timeout=7.5)
+    r = requests.get(base_url, timeout=7.5, headers=header)
     if r.status_code >= 400:
         print(F'{base_url}は無効です')
 
     soup = BeautifulSoup(r.content, 'lxml')
 
     total_number = soup.select_one('td.jlnpc-planListCnt-header > span.s16_F60b').text
-    # print(total_number)
-    max_page_index = int(total_number) // 30 + 1
-
+    max_page_index = int(total_number) // 59.5 + 1
+    max_page_index = math.floor(max_page_index)
 
     for i in range(max_page_index):
         url = base_url.format(30*i)
-        # display = '処理中です'
 
         sleep(3)
 
-        page_r = requests.get(url, timeout=7.5)
+        page_r = requests.get(url, timeout=7.5, headers=header)
         if page_r.status_code >= 400:
             print(F'{url}は無効です')
             continue
@@ -95,7 +100,7 @@ def save():
 
                 sleep(3)
 
-                hotel_page_r = requests.get(page_url, timeout=7.5)
+                hotel_page_r = requests.get(page_url, timeout=7.5, headers=header)
                 if hotel_page_r.status_code >= 400:
                     print(F'{page_url}は無効です')
                     continue
@@ -125,30 +130,38 @@ def save():
 
                 #タイプ別の室数
                 room_tag = hotel_page_soup.select_one('.shisetsu-roomsetsubi_body')
-                tags = room_tag.text
-
-                if '総部屋数' not in tags:
-                    single = room_tag.select_one('tr:nth-child(2) > td > div > table tr:nth-child(2) > td:first-child').text
-                    double = room_tag.select_one('tr:nth-child(2) > td > div > table tr:nth-child(2) > td:nth-child(2)').text
-                    twin = room_tag.select_one('tr:nth-child(2) > td > div > table tr:nth-child(2) > td:nth-child(3)').text
-                    sweet = room_tag.select_one('tr:nth-child(2) > td > div > table tr:nth-child(2) > td:last-child').text
-                    total = None
-
-                elif 'シングル' not in tags:
+                if room_tag is None:
                     single = None
                     double = None
                     twin = None
                     sweet = None
-                    total = room_tag.select_one('tr:nth-child(1) > td > div > table tr:nth-child(2) > td:nth-child(5)').text
-                    total = total.strip()
+                    total = None
 
                 else:
-                    single = room_tag.select_one('tr:nth-child(3) > td > div > table tr:nth-child(2) > td:first-child').text
-                    double = room_tag.select_one('tr:nth-child(3) > td > div > table tr:nth-child(2) > td:nth-child(2)').text
-                    twin = room_tag.select_one('tr:nth-child(3) > td > div > table tr:nth-child(2) > td:nth-child(3)').text
-                    sweet = room_tag.select_one('tr:nth-child(3) > td > div > table tr:nth-child(2) > td:last-child').text
-                    total = room_tag.select_one('tr:nth-child(1) > td > div > table tr:nth-child(2) > td:nth-child(5)').text
-                    total = total.strip()
+                    tags = room_tag.text
+
+                    if '総部屋数' not in tags:
+                        single = room_tag.select_one('tr:nth-child(2) > td > div > table tr:nth-child(2) > td:first-child').text
+                        double = room_tag.select_one('tr:nth-child(2) > td > div > table tr:nth-child(2) > td:nth-child(2)').text
+                        twin = room_tag.select_one('tr:nth-child(2) > td > div > table tr:nth-child(2) > td:nth-child(3)').text
+                        sweet = room_tag.select_one('tr:nth-child(2) > td > div > table tr:nth-child(2) > td:last-child').text
+                        total = None
+
+                    elif 'シングル' not in tags:
+                        single = None
+                        double = None
+                        twin = None
+                        sweet = None
+                        total = room_tag.select_one('tr:nth-child(1) > td > div > table tr:nth-child(2) > td:nth-child(5)').text
+                        total = total.strip()
+
+                    else:
+                        single = room_tag.select_one('tr:nth-child(3) > td > div > table tr:nth-child(2) > td:first-child').text
+                        double = room_tag.select_one('tr:nth-child(3) > td > div > table tr:nth-child(2) > td:nth-child(2)').text
+                        twin = room_tag.select_one('tr:nth-child(3) > td > div > table tr:nth-child(2) > td:nth-child(3)').text
+                        sweet = room_tag.select_one('tr:nth-child(3) > td > div > table tr:nth-child(2) > td:last-child').text
+                        total = room_tag.select_one('tr:nth-child(1) > td > div > table tr:nth-child(2) > td:nth-child(5)').text
+                        total = total.strip()
 
                 hotel_list.append({
                     'ホテル名': hotel,
@@ -264,7 +277,8 @@ progress_label = tkinter.Label(text='')
 progress_label.grid(row=5, column=2, padx=5, pady=5)
 
 #実行
-save_button = tkinter.Button(text='取得', command=save).grid(row=6, column=2, padx=5, pady=20, ipadx=4, ipady=4)
+save_button = tkinter.Button(text='取得', command=save)
+save_button.grid(row=6, column=2, padx=5, pady=20, ipadx=4, ipady=4)
 
 # ウィンドウのループ処理
 root.mainloop()
