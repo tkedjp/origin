@@ -13,7 +13,8 @@ options.add_argument('--incognito')
 #     executable_path='/Users/takashie/Desktop/Lesson/hayatasu/section08/tools/chromedriver',
 #     options=options)
 
-driver = webdriver.Chrome()
+driver = webdriver.Chrome(
+    options=options)
 
 driver.implicitly_wait(10)
 
