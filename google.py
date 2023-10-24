@@ -1,5 +1,6 @@
 from time import sleep, time
 from selenium import webdriver
+import chromedriver_binary
 from bs4 import BeautifulSoup
 from selenium.webdriver.common.keys import Keys
 import pandas as pd
@@ -8,9 +9,11 @@ options = webdriver.ChromeOptions()
 options.add_argument('--incognito')
 # options.add_argument('--headless')
 
-driver = webdriver.Chrome(
-    executable_path='/Users/takashie/Desktop/Lesson/hayatasu/section08/tools/chromedriver',
-    options=options)
+# driver = webdriver.Chrome(
+#     executable_path='/Users/takashie/Desktop/Lesson/hayatasu/section08/tools/chromedriver',
+#     options=options)
+
+driver = webdriver.Chrome()
 
 driver.implicitly_wait(10)
 
