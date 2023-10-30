@@ -11,7 +11,7 @@ options.add_argument('--incognito')
 options.add_argument('--headless')
 
 driver = webdriver.Chrome(
-    executable_path='/Users/takashie/Desktop/Lesson/hayatasu/section08/tools/chromedriver',
+    executable_path='',
     options=options)
 driver.get('https://www.google.co.jp/maps/')
 time.sleep(3)
