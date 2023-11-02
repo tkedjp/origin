@@ -20,10 +20,13 @@ driver.get(base_url)
 sleep(3)
 
 page_links = driver.find_elements_by_css_selector(
-    '.card-box__area')
-print(page_links)
+    '.card-box__area a')
+# print(page_links)
 links = [page_link.get_attribute('href') for page_link in page_links]
 print(links)
+
+# if links in 'javascript':
+    
 
 #pythonファイルのあるディレクトリパス取得
 dir_path = os.path.dirname(os.path.abspath(__file__))
