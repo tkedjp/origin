@@ -16,7 +16,7 @@ driver.implicitly_wait(10)
 
 base_url = 'https://www.athome.co.jp/estate/osaka/list/?pref=27'
 
-url = driver.get(base_url)
+driver.get(base_url)
 sleep(3)
 
 page_links = driver.find_elements_by_css_selector(
