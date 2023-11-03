@@ -12,34 +12,39 @@ driver = webdriver.Chrome(
     options=options)
 driver.implicitly_wait(10)
 
-# max_page_index = 188
+max_page_index = 188
 
-base_url = 'https://www.athome.co.jp/estate/osaka/list/?pref=27'
+base_url = 'https://www.athome.co.jp/estate/osaka/list/page{}/'
 
-driver.get(base_url)
-sleep(3)
+for i in range(max_page_index):
+    base_url = base_url.format(1+i)
 
-page_links = driver.find_elements_by_css_selector(
-    '.card-box__area a')
-links = [page_link.get_attribute('href') for page_link in page_links]
-new_links = [i for i in links if 'https' in links]
-print(new_links)
+    sleep(3)
 
-#pythonファイルのあるディレクトリパス取得
-dir_path = os.path.dirname(os.path.abspath(__file__))
+    driver.get(base_url)
+    sleep(3)
 
-for i, link in enumerate(links):
-    print('='*30, i, '='*30)
-    print(link)
-    driver.get(link)
-    sleep(5)
+    page_links = driver.find_elements_by_css_selector(
+        '.card-box__area a:first-of-type')
+    links = [page_link.get_attribute('href') for page_link in page_links]
+    print(links)
 
-    html = driver.page_source
+    #pythonファイルのあるディレクトリパス取得
+    dir_path = os.path.dirname(os.path.abspath(__file__))
+    print(dir_path)
 
-    #dir_pathの中のhtmlというフォルダに，ファイル名{driver.title}.htmlで保存できる
-    p = os.path.join(dir_path, 'html', f'{driver.title}.html')
-    with open(p, 'w') as f:
-        f.write(html)
+    for i, link in enumerate(links):
+        print('='*30, i, '='*30)
+        print(link)
+        driver.get(link)
+        sleep(5)
+
+        html = driver.page_source
+
+        #dir_pathの中のhtmlというフォルダに，ファイル名{driver.title}.htmlで保存できる
+        p = os.path.join(dir_path, 'html', f'{driver.title}.html')
+        with open(p, 'w') as f:
+            f.write(html)
 
 sleep(3)
 driver.quit()
