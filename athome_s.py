@@ -8,8 +8,6 @@ import pandas as pd
 html_path = os.path.join(os.path.dirname(
     os.path.abspath(__file__)), 'html', '*')
 
-# print(html_path)
-
 list = []
 for path in glob(html_path):
     with open(path, 'r') as f:
